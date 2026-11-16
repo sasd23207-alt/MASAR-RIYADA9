@@ -1,0 +1,18 @@
+<!doctype html>
+<html lang="ar" dir="rtl"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>برنامج الرحلة - {{ r.ref or r.id }}</title><link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+<style>@media print{body{background:#fff}.noprint{display:none}} .print-wrap{max-width:900px;margin:24px auto;padding:18px}</style></head>
+<body><main class="print-wrap">
+<div class="card"><h1>{{ office_name }}</h1><h2>برنامج الرحلة</h2>
+<p>رقم الطلب: {{ r.ref or r.id }} · الوجهة: {{ r.destination or '—' }}</p>
+<p>تاريخ المغادرة: {{ r.depart_date or '—' }} · العودة: {{ r.return_date or '—' }}</p>
+{% if address %}<p>العنوان: {{ address }}</p>{% endif %}{% if phone %}<p>الهاتف: {{ phone }}</p>{% endif %}</div>
+<div class="card"><h3>المسافرون</h3>
+{% if travelers %}<div class="wrap"><table><thead><tr><th>الاسم</th><th>الجنسية</th><th>رقم الجواز</th></tr></thead><tbody>
+{% for t in travelers %}<tr><td>{{ t.full_name }}</td><td>{{ t.nationality or '—' }}</td><td>{{ t.passport_no or '—' }}</td></tr>{% endfor %}
+</tbody></table></div>{% else %}<p class="mut">لم تتم إضافة مسافرين.</p>{% endif %}</div>
+<div class="card"><h3>تفاصيل البرنامج</h3>
+{% if iti %}{% for i in iti %}<div class="check"><b>{{ i.day }}</b> {{ i.title }}{% if i.details %}<span class="mut"> — {{ i.details }}</span>{% endif %}</div>{% endfor %}
+{% else %}<p class="mut">لم تتم إضافة تفاصيل للبرنامج حتى الآن.</p>{% endif %}</div>
+<p class="noprint"><button onclick="window.print()">طباعة البرنامج</button></p>
+</main></body></html>

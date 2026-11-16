@@ -1,0 +1,25 @@
+{% extends "base.html" %}
+{% block title %}ملف العميل - {{ u.name }}{% endblock %}
+{% block body %}
+<div class="card">
+  <h2>ملف العميل: {{ u.name }}</h2>
+  <p class="mut">رقم الهاتف: {{ u.phone }}{% if u.email %} · البريد: {{ u.email }}{% endif %}</p>
+  <h3>تعيين كلمة مرور للعميل</h3>
+  <form method="post">
+    <label>كلمة المرور الجديدة</label>
+    <input type="password" name="password" minlength="6" required>
+    <button type="submit">حفظ كلمة المرور</button>
+  </form>
+</div>
+<div class="card">
+  <h3>طلبات العميل</h3>
+  {% if rows %}
+  <div class="wrap"><table><thead><tr><th>رقم الطلب</th><th>الخدمة</th><th>الوجهة</th><th>الحالة</th><th>التاريخ</th></tr></thead><tbody>
+  {% for r in rows %}
+  <tr><td><a href="{{ url_for('request_view', rid=r.id) }}">{{ r.ref or r.id }}</a></td><td>{{ TYPES.get(r.type, r.type) }}</td><td>{{ r.destination or '—' }}</td><td>{{ r.status }}</td><td>{{ r.created or '—' }}</td></tr>
+  {% endfor %}
+  </tbody></table></div>
+  {% else %}<p class="mut">لا توجد طلبات لهذا العميل حتى الآن.</p>{% endif %}
+  <p><a class="btn sec" href="{{ url_for('admin_clients') }}">العودة إلى العملاء</a></p>
+</div>
+{% endblock %}
