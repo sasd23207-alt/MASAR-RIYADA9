@@ -1,0 +1,6 @@
+{% extends 'base.html' %}{% block body %}
+<div class="card narrow"><h2>تسجيل الدخول</h2>
+<form method="post"><input type="hidden" name="csrf" value="{{ csrf() }}">
+<label>رقم الهاتف</label><input name="phone" required>
+<label>كلمة المرور</label><input type="password" name="password" required>
+<p><button>دخول</button> <a href="{{ url_for('register') }}">حساب جديد</a></p></form></div>{% endblock %}

@@ -1,0 +1,13 @@
+{% extends 'base.html' %}{% block body %}
+<div class="card" style="max-width:640px;margin:auto"><h2>طلب خدمة جديد</h2>
+<form method="post"><input type="hidden" name="csrf" value="{{ csrf() }}">
+{% if clients is not none %}<label>العميل</label><select name="client_id" required>
+<option value="">اختر</option>{% for c in clients %}<option value="{{ c.id }}">{{ c.name }} - {{ c.phone }}</option>{% endfor %}</select>
+{% if not clients %}<p class="mut">أضف العميل أولًا من صفحة العملاء.</p>{% endif %}{% endif %}
+<label>نوع الخدمة</label><select name="type">{% for k,v in TYPES.items() %}<option value="{{ k }}" {{ 'selected' if pk and k=='package' }}>{{ v }}</option>{% endfor %}</select>
+<label>الوجهة</label><input name="destination" value="{{ pk.destination if pk else '' }}">
+<div class="row"><div><label>تاريخ السفر</label><input type="date" name="depart_date"></div>
+<div><label>تاريخ العودة</label><input type="date" name="return_date"></div>
+<div><label>عدد المسافرين</label><input type="number" min="1" name="pax" value="1"></div></div>
+<label>ملاحظات</label><textarea name="notes">{% if pk %}باقة: {{ pk.name }}{% endif %}</textarea>
+<p><button>إرسال الطلب</button></p></form></div>{% endblock %}

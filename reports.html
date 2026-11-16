@@ -1,0 +1,10 @@
+{% extends 'base.html' %}{% block body %}
+{% if missing %}<div class="warn">عملات بدون سعر صرف: {{ missing|join('، ') }}.</div>{% endif %}
+<div class="card"><form class="row" method="get"><input type="number" name="y" value="{{ y }}"><button>عرض السنة</button>
+<a class="btn sec" href="{{ url_for('export', what='requests') }}">تصدير الطلبات (Excel)</a><a class="btn sec" href="{{ url_for('export', what='payments') }}">تصدير الدفعات</a><a class="btn sec" href="{{ url_for('export', what='clients') }}">تصدير العملاء</a></form>
+<p class="mut">إجمالي طلبات {{ y }}: {{ total_n }} | الملغاة: {{ cancelled }}. الأرقام بالعملة الأساسية ({{ base_cur }}).</p></div>
+<div class="card"><h3>المبيعات والربح شهريًا</h3><table>{% for k,m in months.items() %}<tr><td style="width:90px">{{ k }}</td><td><div class="bar" style="width:{{ (m.price/mx*100)|round }}%"></div></td><td style="width:230px">{{ '%.0f'|format(m.price) }} | ربح {{ '%.0f'|format(m.profit) }} | {{ m.n }} طلب</td></tr>{% endfor %}</table></div>
+<div class="grid g2">
+{% for title,data in (('حسب نوع الخدمة', bytype), ('أكثر الوجهات مبيعًا', bydest), ('حسب الموظف المسؤول', bystaff)) %}
+<div class="card"><h3>{{ title }}</h3><table><tr><th></th><th>طلبات</th><th>مبيعات</th><th>ربح</th></tr>
+{% for k,v in data %}<tr><td>{{ k }}</td><td>{{ v.n }}</td><td>{{ '%.0f'|format(v.price) }}</td><td>{{ '%.0f'|format(v.profit) }}</td></tr>{% else %}<tr><td colspan="4" class="mut">لا توجد بيانات.</td></tr>{% endfor %}</table></div>{% endfor %}</div>{% endblock %}

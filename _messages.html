@@ -1,0 +1,5 @@
+<div class="card" id="msgs"><h3>المراسلات</h3>
+{% for m in msgs %}<div class="msg {{ 'staff' if m.role in ('admin','staff') else '' }}"><small>{{ m.name }} - {{ m.created }}</small>{{ m.body }}</div>
+{% else %}<p class="mut">لا توجد رسائل.</p>{% endfor %}
+<form method="post" action="{{ url_for('add_msg', rid=r.id) }}"><input type="hidden" name="csrf" value="{{ csrf() }}">
+<textarea name="body" required></textarea><p><button>إرسال</button></p></form></div>

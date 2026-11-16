@@ -1,0 +1,11 @@
+{% extends 'base.html' %}{% block body %}
+<div class="card"><form class="row" method="get">
+<input name="q" placeholder="بحث: رقم، اسم، هاتف، وجهة" value="{{ s }}">
+<select name="status"><option value="">كل الحالات</option>{% for x in STATUSES %}<option {{ 'selected' if x==st }}>{{ x }}</option>{% endfor %}</select>
+<select name="type"><option value="">كل الخدمات</option>{% for k,v in TYPES.items() %}<option value="{{ k }}" {{ 'selected' if k==ty }}>{{ v }}</option>{% endfor %}</select>
+<button>بحث</button><a class="btn sec" href="{{ url_for('admin_new') }}">+ طلب جديد</a></form></div>
+<div class="card wrap"><table><tr><th>الرقم</th><th>العميل</th><th>الخدمة</th><th>الوجهة</th><th>السفر</th><th>الحالة</th><th>السعر</th></tr>
+{% for r in rows %}<tr><td><a href="{{ url_for('request_view', rid=r.id) }}">{{ r.ref }}</a>{% if r.unread %} <span class="dot">{{ r.unread }}</span>{% endif %}</td><td>{{ r.client_name }}<br><span class="mut">{{ r.client_phone }}</span></td>
+<td>{{ TYPES.get(r.type, r.type) }}</td><td>{{ r.destination }}</td><td>{{ r.depart_date }}</td><td><span class="badge s{{ STATUSES.index(r.status) }}">{{ r.status }}</span></td>
+<td>{% if r.price %}{{ '%.2f'|format(r.price) }} {{ r.currency }}{% endif %}</td></tr>
+{% else %}<tr><td colspan="7" class="mut">لا توجد طلبات.</td></tr>{% endfor %}</table></div>{% endblock %}

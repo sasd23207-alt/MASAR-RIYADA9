@@ -1,0 +1,14 @@
+{% extends 'base.html' %}{% block body %}
+<div class="card"><h2>طلب {{ r.ref }} <span class="badge s{{ STATUSES.index(r.status) }}">{{ r.status }}</span></h2>
+<p>{{ TYPES.get(r.type, r.type) }} | الوجهة: {{ r.destination or '-' }} | السفر: {{ r.depart_date or '-' }} | العودة: {{ r.return_date or '-' }} | المسافرون: {{ r.pax }}</p>
+{% if r.notes %}<p class="mut">{{ r.notes }}</p>{% endif %}
+{% if r.quote_note %}<h3>عرض المكتب</h3><div class="qbox">{{ r.quote_note }}</div>{% endif %}
+{% if r.price %}<p>السعر: <b>{{ '%.2f'|format(r.price) }} {{ r.currency }}</b>{% if pays %} | المتبقي بالعملة الأساسية: {{ '%.2f'|format(t.due) }} {{ base_cur }}{% endif %}{% if r.payment_due %} | آخر موعد للدفع: {{ r.payment_due }}{% endif %}
+ <a href="{{ url_for('invoice', rid=r.id) }}" target="_blank">الفاتورة</a></p>{% endif %}
+{% if r.status == 'عرض سعر مرسل' %}<div class="card" style="background:#fffbea">
+<form class="inline" method="post" action="{{ url_for('quote_decision', rid=r.id) }}"><input type="hidden" name="csrf" value="{{ csrf() }}"><input type="hidden" name="d" value="accept"><button>قبول العرض</button></form>
+<form method="post" action="{{ url_for('quote_decision', rid=r.id) }}" style="margin-top:10px"><input type="hidden" name="csrf" value="{{ csrf() }}"><input type="hidden" name="d" value="reject">
+<input name="reason" placeholder="وش التعديل اللي تبيه؟"><p><button class="sec">طلب تعديل</button></p></form></div>{% endif %}
+{% if check %}<h3>متطلبات الملف</h3>{% for c in check %}<div class="check"><span class="{{ 'done' if c.done }}">{{ '✔' if c.done else '○' }} {{ c.title }}</span></div>{% endfor %}{% endif %}
+{% if r.status in ('جديد','عرض سعر مرسل') %}<form method="post" action="{{ url_for('client_cancel', rid=r.id) }}"><input type="hidden" name="csrf" value="{{ csrf() }}"><button class="del" onclick="return confirm('إلغاء الطلب؟')">إلغاء الطلب</button></form>{% endif %}</div>
+{% include '_itinerary_view.html' %}{% include '_travelers.html' %}{% include '_docs.html' %}{% include '_messages.html' %}{% endblock %}

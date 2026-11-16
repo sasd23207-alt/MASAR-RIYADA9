@@ -1,0 +1,7 @@
+{% extends 'base.html' %}{% block body %}
+<div class="grid g2"><div class="card"><h3>إضافة عميل</h3><form method="post"><input type="hidden" name="csrf" value="{{ csrf() }}">
+<label>الاسم</label><input name="name" required><label>الهاتف</label><input name="phone" required><label>البريد (اختياري)</label><input name="email"><p><button>إضافة</button></p></form></div>
+<div class="card"><h3>بحث</h3><form class="row" method="get"><input name="q" value="{{ s }}" placeholder="اسم أو هاتف"><button>بحث</button></form></div></div>
+<div class="card wrap"><table><tr><th>الاسم</th><th>الهاتف</th><th>البريد</th><th>الطلبات</th></tr>
+{% for u in rows %}<tr><td><a href="{{ url_for('admin_client', uid=u.id) }}">{{ u.name }}</a></td><td>{{ u.phone }}</td><td>{{ u.email }}</td><td>{{ u.n }}</td></tr>
+{% else %}<tr><td colspan="4" class="mut">لا يوجد عملاء.</td></tr>{% endfor %}</table></div>{% endblock %}

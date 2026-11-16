@@ -1,0 +1,7 @@
+<div class="card"><h3>المستندات</h3>
+{% for d in docs %}<div class="check"><a href="{{ url_for('get_file', did=d.id) }}">{{ d.label or d.original }}</a><span class="mut">{{ d.created }}</span>
+{% if g.user.role in ('admin','staff') %}<form method="post" action="{{ url_for('admin_action', rid=r.id, action='doc_del') }}"><input type="hidden" name="csrf" value="{{ csrf() }}"><input type="hidden" name="id" value="{{ d.id }}"><button class="del">حذف</button></form>{% endif %}</div>
+{% else %}<p class="mut">لا توجد مستندات.</p>{% endfor %}
+<form method="post" enctype="multipart/form-data" action="{{ url_for('add_doc', rid=r.id) }}"><input type="hidden" name="csrf" value="{{ csrf() }}">
+<div class="row"><div><label>وصف المستند (جواز، صورة...)</label><input name="label"></div><div><label>الملف (pdf, jpg, png, docx) حتى 10 ميجا</label><input type="file" name="file" required></div></div>
+<p><button class="sec">رفع</button></p></form></div>

@@ -1,0 +1,6 @@
+{% extends 'base.html' %}{% block body %}
+<div class="card"><h3>إضافة موظف</h3><form method="post"><input type="hidden" name="csrf" value="{{ csrf() }}">
+<div class="row"><input name="name" placeholder="الاسم" required><input name="phone" placeholder="الهاتف (للدخول)" required><input type="password" name="password" placeholder="كلمة المرور" required></div><p><button>إضافة</button></p></form></div>
+<div class="card wrap"><table><tr><th>الاسم</th><th>الهاتف</th><th>الدور</th><th></th></tr>
+{% for u in rows %}<tr><td>{{ u.name }}</td><td>{{ u.phone }}</td><td>{{ 'مدير' if u.role=='admin' else 'موظف' }}</td>
+<td>{% if u.role=='staff' %}<form method="post"><input type="hidden" name="csrf" value="{{ csrf() }}"><input type="hidden" name="delete" value="{{ u.id }}"><button class="del" onclick="return confirm('حذف الموظف؟')">حذف</button></form>{% endif %}</td></tr>{% endfor %}</table></div>{% endblock %}

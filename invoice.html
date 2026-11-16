@@ -1,0 +1,9 @@
+<!doctype html><html lang="ar" dir="rtl"><head><meta charset="utf-8"><title>فاتورة {{ r.ref }}</title>
+<link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}"></head><body><main>
+<p class="noprint"><button onclick="window.print()">طباعة</button> <a href="{{ url_for('request_view', rid=r.id) }}">رجوع</a></p>
+<div class="card"><h2>{{ office_name }}</h2><p class="mut">{{ phone }} {{ address }}</p><hr>
+<h3>فاتورة / عرض سعر رقم {{ r.ref }}</h3><p>العميل: {{ r.client_name }} ({{ r.client_phone }})<br>الخدمة: {{ TYPES.get(r.type) }} - {{ r.destination }}<br>السفر: {{ r.depart_date }} العودة: {{ r.return_date }}</p>
+{% if travelers %}<p><b>المسافرون:</b> {% for t in travelers %}{{ t.full_name }}{{ '، ' if not loop.last }}{% endfor %}</p>{% endif %}
+<table><tr><td>الإجمالي</td><td><b>{{ '%.2f'|format(r.price or 0) }} {{ r.currency }}</b></td></tr></table>
+{% if pays %}<h3>الدفعات</h3><table>{% for p in pays %}<tr><td>{{ p.created }}</td><td>{{ 'مسترجع' if p.kind=='refund' else 'مستلم' }}</td><td>{{ '%.2f'|format(p.amount) }} {{ p.currency }}</td></tr>{% endfor %}</table>{% endif %}
+<p>المتبقي ({{ base_cur }}): <b>{{ '%.2f'|format(t.due) }}</b></p></div></main></body></html>

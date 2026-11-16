@@ -1,0 +1,60 @@
+{% extends 'base.html' %}{% block body %}
+{% for w in warns %}<div class="warn">⚠ {{ w }}</div>{% endfor %}
+<div class="card"><h2>طلب {{ r.ref }} <span class="badge s{{ STATUSES.index(r.status) }}">{{ r.status }}</span></h2>
+<p>العميل: <a href="{{ url_for('admin_client', uid=r.client_id) }}">{{ r.client_name }}</a> ({{ r.client_phone }})
+<a class="btn wa" target="_blank" href="{{ r.client_phone|wa('السلام عليكم ' ~ r.client_name ~ '، بخصوص طلبك رقم ' ~ r.ref ~ ' (' ~ r.status ~ ') في ' ~ office_name) }}">واتساب</a></p>
+<p>{{ TYPES.get(r.type, r.type) }} | الوجهة: {{ r.destination or '-' }} | السفر: {{ r.depart_date or '-' }} | العودة: {{ r.return_date or '-' }} | المسافرون: {{ r.pax }}</p>
+{% if r.notes %}<p class="mut">ملاحظات العميل: {{ r.notes }}</p>{% endif %}
+<a class="btn sec" href="{{ url_for('invoice', rid=r.id) }}" target="_blank">الفاتورة / الطباعة</a>
+<a class="btn sec" href="{{ url_for('itinerary', rid=r.id) }}" target="_blank">برنامج الرحلة</a></div>
+<div class="grid g2"><div>
+{% include '_travelers.html' %}{% include '_docs.html' %}{% include '_messages.html' %}
+<div class="card"><h3>برنامج الرحلة (يظهر للعميل)</h3>
+{% for i in iti %}<div class="check"><b>{{ i.day }}</b> {{ i.title }} <span class="mut">{{ i.details }}</span>
+<form method="post" action="{{ url_for('admin_action', rid=r.id, action='iti_del') }}"><input type="hidden" name="csrf" value="{{ csrf() }}"><input type="hidden" name="id" value="{{ i.id }}"><button class="del">×</button></form></div>{% endfor %}
+<form method="post" action="{{ url_for('admin_action', rid=r.id, action='iti_add') }}"><input type="hidden" name="csrf" value="{{ csrf() }}">
+<div class="row"><input type="date" name="day"><input name="title" placeholder="العنوان (وصول، جولة، رحلة داخلية...)"></div>
+<input name="details" placeholder="التفاصيل" style="margin-top:6px"><p><button class="sec">إضافة</button></p></form></div>
+<div class="card"><h3>سجل العمليات</h3>{% for l in logs %}<div class="check"><span class="mut">{{ l.created }}</span> {{ l.text }} <span class="mut">({{ l.name or 'النظام' }})</span></div>{% else %}<p class="mut">لا يوجد.</p>{% endfor %}</div>
+</div><div>
+<div class="card"><h3>إدارة الطلب</h3>
+<form method="post" action="{{ url_for('admin_action', rid=r.id, action='update') }}"><input type="hidden" name="csrf" value="{{ csrf() }}">
+<label>الحالة (اختر "عرض سعر مرسل" ليظهر للعميل زر القبول)</label><select name="status">{% for s in STATUSES %}<option {{ 'selected' if s==r.status }}>{{ s }}</option>{% endfor %}</select>
+<div class="row"><div><label>سعر البيع للعميل</label><input name="price" value="{{ r.price or '' }}"></div>
+<div><label>العملة</label><select name="currency">{% for c in codes %}<option {{ 'selected' if c==r.currency }}>{{ c }}</option>{% endfor %}</select></div>
+<div><label>آخر موعد للدفع</label><input type="date" name="payment_due" value="{{ r.payment_due or '' }}"></div></div>
+<label>نص عرض السعر للعميل (ما يشمله العرض وشروطه)</label><textarea name="quote_note">{{ r.quote_note or '' }}</textarea>
+<label>الموظف المسؤول</label><select name="assigned_to"><option value="">-</option>{% for s in staff %}<option value="{{ s.id }}" {{ 'selected' if s.id==r.assigned_to }}>{{ s.name }}</option>{% endfor %}</select>
+<label>ملاحظة داخلية (لا يراها العميل)</label><textarea name="internal_note">{{ r.internal_note or '' }}</textarea>
+<p><button>حفظ</button></p></form></div>
+<div class="card"><h3>الحساب بالعملة الأساسية ({{ base_cur }})</h3>
+<table><tr><td>سعر البيع</td><td>{{ '%.2f'|format(t.price) }}</td></tr><tr><td>المدفوع</td><td>{{ '%.2f'|format(t.paid) }}</td></tr>
+<tr><td>المتبقي</td><td class="{{ 'bad' if t.due>0.001 else 'ok' }}">{{ '%.2f'|format(t.due) }}</td></tr>
+<tr><td>التكلفة (الموردون)</td><td>{{ '%.2f'|format(t.cost) }}</td></tr><tr><td><b>الربح</b></td><td><b>{{ '%.2f'|format(t.profit) }}</b>{% if t.price %} ({{ '%.0f'|format(t.profit/t.price*100) }}%){% endif %}</td></tr></table></div>
+<div class="card"><h3>الخدمات والتكاليف (الحجوزات عند الموردين)</h3>
+{% for i in items %}<div class="check">{{ ITEM_KINDS.get(i.kind, i.kind) }}: {{ i.details }} {% if i.sname %}<span class="mut">({{ i.sname }})</span>{% endif %} {% if i.ref_code %}<span class="mut">رمز: {{ i.ref_code }}</span>{% endif %} - <b>{{ '%.2f'|format(i.cost) }} {{ i.currency }}</b>
+<form method="post" action="{{ url_for('admin_action', rid=r.id, action='item_pay') }}"><input type="hidden" name="csrf" value="{{ csrf() }}"><input type="hidden" name="id" value="{{ i.id }}"><button class="sec">{{ 'مدفوع للمورد ✔' if i.paid else 'لم يُدفع للمورد' }}</button></form>
+<form method="post" action="{{ url_for('admin_action', rid=r.id, action='item_del') }}"><input type="hidden" name="csrf" value="{{ csrf() }}"><input type="hidden" name="id" value="{{ i.id }}"><button class="del">×</button></form></div>{% endfor %}
+<form method="post" action="{{ url_for('admin_action', rid=r.id, action='item_add') }}"><input type="hidden" name="csrf" value="{{ csrf() }}">
+<div class="row"><select name="kind">{% for k,v in ITEM_KINDS.items() %}<option value="{{ k }}">{{ v }}</option>{% endfor %}</select>
+<select name="supplier_id"><option value="">المورد</option>{% for s in suppliers %}<option value="{{ s.id }}">{{ s.name }}</option>{% endfor %}</select></div>
+<input name="details" placeholder="التفاصيل (رحلة، فندق، ليالي...)" style="margin-top:6px">
+<div class="row" style="margin-top:6px"><input name="cost" placeholder="التكلفة"><select name="currency">{% for c in codes %}<option {{ 'selected' if c==r.currency }}>{{ c }}</option>{% endfor %}</select><input name="ref_code" placeholder="رمز الحجز (PNR)"></div>
+<p><button class="sec">إضافة</button></p></form></div>
+<div class="card"><h3>قائمة متطلبات الملف / التأشيرة</h3>
+{% for c in check %}<div class="check"><form method="post" action="{{ url_for('admin_action', rid=r.id, action='check_toggle') }}"><input type="hidden" name="csrf" value="{{ csrf() }}"><input type="hidden" name="id" value="{{ c.id }}"><button class="sec">{{ '✔' if c.done else '○' }}</button></form><span class="{{ 'done' if c.done }}">{{ c.title }}</span>
+<form method="post" action="{{ url_for('admin_action', rid=r.id, action='check_del') }}"><input type="hidden" name="csrf" value="{{ csrf() }}"><input type="hidden" name="id" value="{{ c.id }}"><button class="del">×</button></form></div>{% endfor %}
+<form class="row" method="post" action="{{ url_for('admin_action', rid=r.id, action='check_add') }}"><input type="hidden" name="csrf" value="{{ csrf() }}"><input name="title" placeholder="متطلب جديد"><button class="sec">إضافة</button></form>
+<form method="post" action="{{ url_for('admin_action', rid=r.id, action='check_defaults') }}" style="margin-top:6px"><input type="hidden" name="csrf" value="{{ csrf() }}"><button class="sec">إضافة القائمة المعتادة للتأشيرة</button></form></div>
+<div class="card"><h3>الدفعات</h3>
+{% for p in pays %}<div class="check">{{ p.created }} - {{ 'مسترجع' if p.kind=='refund' else 'مستلم' }} <b>{{ '%.2f'|format(p.amount) }} {{ p.currency }}</b> ({{ p.method }}) {{ p.note }}
+<form method="post" action="{{ url_for('admin_action', rid=r.id, action='pay_del') }}"><input type="hidden" name="csrf" value="{{ csrf() }}"><input type="hidden" name="id" value="{{ p.id }}"><button class="del">×</button></form></div>{% endfor %}
+<form method="post" action="{{ url_for('admin_action', rid=r.id, action='pay_add') }}"><input type="hidden" name="csrf" value="{{ csrf() }}">
+<div class="row"><input name="amount" placeholder="المبلغ"><select name="currency">{% for c in codes %}<option {{ 'selected' if c==r.currency }}>{{ c }}</option>{% endfor %}</select>
+<select name="method">{% for m in PAY_METHODS %}<option>{{ m }}</option>{% endfor %}</select><select name="kind"><option value="received">استلام</option><option value="refund">استرجاع</option></select></div>
+<input name="note" placeholder="ملاحظة" style="margin-top:6px"><p><button class="sec">تسجيل دفعة</button></p></form></div>
+<div class="card"><h3>مهام ومتابعات لهذا الطلب</h3>
+{% for k in tasks %}<div class="check"><form method="post" action="{{ url_for('tasks') }}"><input type="hidden" name="csrf" value="{{ csrf() }}"><input type="hidden" name="toggle" value="{{ k.id }}"><button class="sec">{{ '✔' if k.done else '○' }}</button></form><span class="{{ 'done' if k.done }}">{{ k.title }}</span> <b>{{ k.due }}</b> <span class="mut">{{ k.uname or '' }}</span></div>{% endfor %}
+<form method="post" action="{{ url_for('admin_action', rid=r.id, action='task_add') }}"><input type="hidden" name="csrf" value="{{ csrf() }}">
+<div class="row"><input name="title" placeholder="مثال: متابعة السفارة" required><input type="date" name="due"><select name="assigned_to"><option value="">-</option>{% for s in staff %}<option value="{{ s.id }}">{{ s.name }}</option>{% endfor %}</select></div><p><button class="sec">إضافة مهمة</button></p></form></div>
+</div></div>{% endblock %}

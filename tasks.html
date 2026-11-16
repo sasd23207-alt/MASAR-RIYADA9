@@ -1,0 +1,7 @@
+{% extends 'base.html' %}{% block body %}
+<div class="card"><h3>مهمة / متابعة جديدة</h3><form method="post"><input type="hidden" name="csrf" value="{{ csrf() }}">
+<div class="row"><input name="title" placeholder="مثال: اتصل بالعميل لتأكيد الموعد" required><input type="date" name="due">
+<select name="assigned_to"><option value="">لأي موظف</option>{% for s in staff %}<option value="{{ s.id }}">{{ s.name }}</option>{% endfor %}</select><button>إضافة</button></div></form></div>
+<div class="card">{% for t in rows %}<div class="check"><form method="post"><input type="hidden" name="csrf" value="{{ csrf() }}"><input type="hidden" name="toggle" value="{{ t.id }}"><button class="sec">{{ '✔' if t.done else '○' }}</button></form>
+<span class="{{ 'done' if t.done }}">{{ t.title }}</span> {% if t.due %}<b class="{{ 'bad' if t.due < today and not t.done }}">{{ t.due }}</b>{% endif %} {% if t.ref %}<a href="{{ url_for('request_view', rid=t.request_id) }}">{{ t.ref }}</a>{% endif %} <span class="mut">{{ t.uname or '' }}</span>
+<form method="post"><input type="hidden" name="csrf" value="{{ csrf() }}"><input type="hidden" name="delete" value="{{ t.id }}"><button class="del">×</button></form></div>{% else %}<p class="mut">لا توجد مهام.</p>{% endfor %}</div>{% endblock %}

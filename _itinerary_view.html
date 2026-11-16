@@ -1,0 +1,3 @@
+{% if iti %}<div class="card"><h3>برنامج الرحلة</h3>
+{% for i in iti %}<div class="check"><b>{{ i.day }}</b> {{ i.title }}{% if i.details %}<span class="mut"> - {{ i.details }}</span>{% endif %}</div>{% endfor %}
+<p><a class="btn sec" href="{{ url_for('itinerary', rid=r.id) }}" target="_blank">نسخة للطباعة</a></p></div>{% endif %}

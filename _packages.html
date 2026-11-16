@@ -1,0 +1,4 @@
+{% if packages %}<div class="card"><h2>عروض المكتب</h2><div class="packs">
+{% for p in packages %}<div class="pk"><h3>{{ p.name }}</h3><div class="mut">{{ p.destination }} {% if p.duration %}| {{ p.duration }}{% endif %}</div>
+<p>{{ p.description }}</p>{% if p.price %}<div class="price">{{ '%.0f'|format(p.price) }} {{ p.currency }}</div>{% endif %}
+<p><a class="btn" href="{{ url_for('client_new', package=p.id) }}">اطلب هذه الباقة</a></p></div>{% endfor %}</div></div>{% endif %}

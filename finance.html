@@ -1,0 +1,9 @@
+{% extends 'base.html' %}{% block body %}
+{% if missing %}<div class="warn">عملات بدون سعر صرف: {{ missing|join('، ') }}. أضفها من الإعدادات.</div>{% endif %}
+<div class="card"><form class="row" method="get"><input type="month" name="m" value="{{ m }}"><button>تصفية بالشهر</button><a class="btn sec" href="{{ url_for('finance') }}">الكل</a></form></div>
+<div class="stats"><div class="stat"><b>{{ '%.0f'|format(tot.price) }}</b><span>المبيعات</span></div><div class="stat"><b>{{ '%.0f'|format(tot.paid) }}</b><span>المحصّل</span></div>
+<div class="stat"><b>{{ '%.0f'|format(tot.due) }}</b><span>المتبقي</span></div><div class="stat"><b>{{ '%.0f'|format(tot.cost) }}</b><span>التكاليف</span></div><div class="stat"><b>{{ '%.0f'|format(tot.profit) }}</b><span>الربح</span></div></div>
+<p class="mut">كل الأرقام بالعملة الأساسية ({{ base_cur }}) حسب أسعار الصرف المدخلة.</p>
+<div class="card wrap"><table><tr><th>الطلب</th><th>العميل</th><th>البيع</th><th>المحصّل</th><th>المتبقي</th><th>التكلفة</th><th>الربح</th></tr>
+{% for r,t in rows %}<tr><td><a href="{{ url_for('request_view', rid=r.id) }}">{{ r.ref }}</a></td><td>{{ r.client_name }}</td><td>{{ '%.2f'|format(t.price) }}</td><td>{{ '%.2f'|format(t.paid) }}</td>
+<td class="{{ 'bad' if t.due>0.001 }}">{{ '%.2f'|format(t.due) }}</td><td>{{ '%.2f'|format(t.cost) }}</td><td>{{ '%.2f'|format(t.profit) }}</td></tr>{% endfor %}</table></div>{% endblock %}

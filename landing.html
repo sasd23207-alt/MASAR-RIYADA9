@@ -1,0 +1,7 @@
+{% extends 'base.html' %}{% block body %}
+<div class="hero"><h1>{{ office_name }}</h1>
+<p class="mut">حجز الطيران والفنادق والتأشيرات والرحلات، قدّم طلبك وتابعه من مكانك.</p>
+<p><a class="btn" href="{{ url_for('register') }}">إنشاء حساب وطلب خدمة</a>
+<a class="btn sec" href="{{ url_for('login') }}">تسجيل الدخول</a></p>
+{% if phone %}<p>هاتف المكتب: {{ phone }}</p>{% endif %}{% if address %}<p class="mut">{{ address }}</p>{% endif %}</div>
+{% include '_packages.html' %}{% endblock %}

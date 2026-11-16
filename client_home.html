@@ -1,0 +1,9 @@
+{% extends 'base.html' %}{% block body %}
+<div class="card"><div class="row" style="align-items:center"><h2>طلباتي</h2>
+<div style="text-align:left"><a class="btn" href="{{ url_for('client_new') }}">طلب جديد</a></div></div>
+{% if rows %}<div class="wrap"><table><tr><th>الرقم</th><th>الخدمة</th><th>الوجهة</th><th>السفر</th><th>الحالة</th></tr>
+{% for r in rows %}<tr><td><a href="{{ url_for('request_view', rid=r.id) }}">{{ r.ref }}</a></td>
+<td>{{ TYPES.get(r.type, r.type) }}</td><td>{{ r.destination }}</td><td>{{ r.depart_date }}</td>
+<td><span class="badge s{{ STATUSES.index(r.status) }}">{{ r.status }}</span>{% if r.status == 'عرض سعر مرسل' %} <b class="bad">بانتظار ردك</b>{% endif %}</td></tr>{% endfor %}</table></div>
+{% else %}<p class="mut">ما عندك طلبات لحد الآن.</p>{% endif %}</div>
+{% include '_packages.html' %}{% endblock %}

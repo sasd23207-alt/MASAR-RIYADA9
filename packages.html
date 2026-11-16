@@ -1,0 +1,9 @@
+{% extends 'base.html' %}{% block body %}
+<div class="card"><h3>باقة / عرض جديد (يظهر للعملاء في الواجهة)</h3><form method="post"><input type="hidden" name="csrf" value="{{ csrf() }}">
+<div class="row"><input name="name" placeholder="اسم الباقة" required><input name="destination" placeholder="الوجهة"><input name="duration" placeholder="المدة (مثال: 7 أيام)"></div>
+<div class="row" style="margin-top:6px"><input name="price" placeholder="السعر"><select name="currency">{% for c in codes %}<option>{{ c }}</option>{% endfor %}</select></div>
+<textarea name="description" placeholder="وصف الباقة وما تشمله" style="margin-top:6px"></textarea><p><button>حفظ</button></p></form></div>
+<div class="card wrap"><table><tr><th>الباقة</th><th>الوجهة</th><th>السعر</th><th>الحالة</th><th></th></tr>
+{% for p in rows %}<tr><td>{{ p.name }}<br><span class="mut">{{ p.duration }}</span></td><td>{{ p.destination }}</td><td>{{ '%.0f'|format(p.price or 0) }} {{ p.currency }}</td><td>{{ 'ظاهرة' if p.active else 'مخفية' }}</td>
+<td><form class="inline" method="post"><input type="hidden" name="csrf" value="{{ csrf() }}"><input type="hidden" name="toggle" value="{{ p.id }}"><button class="sec">إظهار/إخفاء</button></form>
+<form class="inline" method="post"><input type="hidden" name="csrf" value="{{ csrf() }}"><input type="hidden" name="delete" value="{{ p.id }}"><button class="del">حذف</button></form></td></tr>{% else %}<tr><td colspan="5" class="mut">لا توجد باقات.</td></tr>{% endfor %}</table></div>{% endblock %}

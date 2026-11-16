@@ -1,0 +1,12 @@
+<div class="card"><h3>المسافرون والتأشيرات</h3>
+{% if travelers %}<div class="wrap"><table><tr><th>الاسم (كما في الجواز)</th><th>الجواز</th><th>انتهاء الجواز</th><th>الميلاد / الجنسية</th><th>التأشيرة</th><th></th></tr>
+{% for t in travelers %}<tr><td>{{ t.full_name }}</td><td>{{ t.passport_no }}</td><td>{{ t.passport_expiry }}</td><td>{{ t.birth_date }}<br><span class="mut">{{ t.nationality }}</span></td>
+<td>{% if g.user.role in ('admin','staff') %}<form method="post" action="{{ url_for('admin_action', rid=r.id, action='visa_update') }}"><input type="hidden" name="csrf" value="{{ csrf() }}"><input type="hidden" name="id" value="{{ t.id }}">
+<select name="visa_status">{% for v in VISA_STATUSES %}<option {{ 'selected' if v==t.visa_status }}>{{ v }}</option>{% endfor %}</select>
+<input name="visa_no" value="{{ t.visa_no or '' }}" placeholder="رقم التأشيرة"><input type="date" name="visa_expiry" value="{{ t.visa_expiry or '' }}"><button class="sec">حفظ</button></form>
+{% else %}<b>{{ t.visa_status or 'لم تُقدَّم' }}</b> {{ t.visa_no or '' }}{% endif %}</td>
+<td><form class="inline" method="post" action="{{ url_for('del_traveler', rid=r.id, tid=t.id) }}"><input type="hidden" name="csrf" value="{{ csrf() }}"><button class="del">حذف</button></form></td></tr>{% endfor %}</table></div>{% endif %}
+<form method="post" action="{{ url_for('add_traveler', rid=r.id) }}"><input type="hidden" name="csrf" value="{{ csrf() }}">
+<div class="row"><div><label>الاسم الكامل</label><input name="full_name" required></div><div><label>رقم الجواز</label><input name="passport_no"></div>
+<div><label>انتهاء الجواز</label><input type="date" name="passport_expiry"></div><div><label>تاريخ الميلاد</label><input type="date" name="birth_date"></div>
+<div><label>الجنسية</label><input name="nationality"></div></div><p><button class="sec">إضافة مسافر</button></p></form></div>
