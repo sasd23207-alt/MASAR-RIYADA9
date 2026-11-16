@@ -1,16 +1,14 @@
 <!doctype html><html lang="ar" dir="rtl"><head><meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
-<title>{% block title %}{{ office_name }}{% endblock %}</title>
+<title>{% block title %}منظومة المسار - مكتب ZIGO للسفر والسياحة والعمرة{% endblock %}</title>
 <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}"></head><body>
-<header class="top"><a class="brand" href="/">{{ office_name }}</a><nav>
+<header class="top"><a class="brand" href="/"><span>منظومة المسار</span><small style="display:block;font-size:.72em;font-weight:400">مكتب ZIGO للسفر والسياحة والعمرة</small></a><nav>
 {% if g.user %}
  {% if g.user.role in ('admin','staff') %}
   <a href="{{ url_for('admin') }}">اللوحة</a>
   <a href="{{ url_for('admin_requests') }}">الطلبات{% if unread %} <span class="dot">{{ unread }}</span>{% endif %}</a>
-  <a href="{{ url_for('tasks') }}">المهام</a>
-  <a href="{{ url_for('admin_clients') }}">العملاء</a>
-  <a href="{{ url_for('finance') }}">المالية</a>
-  <a href="{{ url_for('suppliers') }}">الموردون</a>
+  <a href="{{ url_for('tasks') }}">المهام</a><a href="{{ url_for('admin_clients') }}">العملاء</a>
+  <a href="{{ url_for('finance') }}">المالية</a><a href="{{ url_for('suppliers') }}">الموردون</a>
   <a href="{{ url_for('packages') }}">الباقات</a><a href="{{ url_for('reports') }}">التقارير</a>
   {% if g.user.role == 'admin' %}<a href="{{ url_for('staff') }}">الموظفون</a><a href="{{ url_for('settings') }}">الإعدادات</a>{% endif %}
  {% else %}
